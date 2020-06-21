@@ -7,4 +7,6 @@
   :main ^:skip-aot fake-data.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}
-             :dev {:dependencies [[org.clojure/test.check "0.9.0"]]}})
+             :dev {:dependencies [[org.clojure/test.check "0.9.0"]]}}
+  :plugins [[lein-cljfmt "0.6.7"]]
+  :cljfmt {})
