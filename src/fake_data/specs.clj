@@ -5,7 +5,7 @@
 
 ;; fake-data.behaviour
 
-(s/def ::name (s/or :keyword keyword? :string string?))
+(s/def ::name (s/or :keyword keyword? :string (s/and string? #(> (count %) 1))))
 (s/def ::branch (s/nilable (s/or :keyword keyword?
                                  :string string?
                                  :number number?
@@ -20,6 +20,7 @@
 (s/def ::chances (s/map-of ::name (s/double-in :min 0.0 :max 1.0)))
 (s/def ::decision (s/cat :id ::name :choice ::branch))
 (s/def ::decisions (s/+ ::decision))
+(s/def ::decisions-map (s/map-of ::name ::branch))
 
 (s/fdef fake-data.behaviour/tree
   :args (s/+ (s/or :simple ::name :full ::child))
@@ -34,5 +35,13 @@
   :ret ::decisions)
 
 (s/fdef fake-data.behaviour/deduplicate-keys
-  :args ::decisions
-  :ret ::decisions)
+  :args (s/coll-of ::decision)
+  :ret (s/coll-of (s/coll-of ::decision)))
+
+(s/fdef fake-data.behaviour/hash-solved-tree
+  :args ::decisions-map
+  :ret (s/+ ::decisions-map))
+
+(s/fdef fake-data.behaviour/solve-tree
+  :args (s/cat :tree ::tree :chances ::chances)
+  :ret ::decisions-map)

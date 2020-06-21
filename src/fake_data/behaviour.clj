@@ -41,8 +41,8 @@
 (defn deduplicate-keys
   "Deduplicate keys in a solved tree"
   [input]
-  {:pre [(s/valid? ::specs/decisions input)]
-   :post [(s/valid? ::specs/decisions %)]}
+  {:pre [(s/valid? (s/coll-of ::specs/decision) input)]
+   :post [(s/valid? (s/coll-of (s/coll-of ::specs/decision)) %)]}
   (let [freqs (frequencies (map first input))]
     (for [[key freq] freqs]
       (let [entries (map-indexed list (filter #(= (first %) key) input))]
@@ -53,18 +53,21 @@
 
 (defn hash-solved-tree
   "Transform a solved tree into a list of hash-maps"
-  [tree]
+  [solved-tree-map]
+  {:pre [(s/valid? ::specs/decisions-map solved-tree-map)]
+   :post [(s/valid? (s/+ ::specs/decisions-map) %)]}
   (defn deep-hash-map [[k v]]
     (cond
       (vector? v) (hash-map k (deep-hash-map v))
       (seq? v) (->> v (deduplicate-keys) (apply concat) (map deep-hash-map) (apply merge) (hash-map k))
       :else (hash-map k v)))
-  (map deep-hash-map tree))
+  (map deep-hash-map solved-tree-map))
 
 (defn solve-tree
   "Solve a behaviour tree by picking weighted choices for each node"
   [tree chances]
-  {:pre [(s/valid? ::specs/tree tree) (s/valid? ::specs/chances chances)]}
+  {:pre [(s/valid? ::specs/tree tree) (s/valid? ::specs/chances chances)]
+   :post [(s/valid? ::specs/decisions-map %)]}
   (->> (solve-nodes tree chances)
        (apply hash-map)
        (hash-solved-tree)
