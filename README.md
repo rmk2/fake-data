@@ -1,4 +1,4 @@
-# Fake Data #
+# Fake Data
 
 This project aims to provide a generator that allows for the creation of fake
 data that looks plausible enough to be used in demos and/or for testing. It
